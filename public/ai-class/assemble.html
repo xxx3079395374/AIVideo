@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>组装工坊 · FORGE3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#030812;--card:rgba(8,20,42,0.88);
+  --neon:#00C8FF;--orange:#FF6B1A;--green:#3BFF5A;--gold:#FFB800;--purple:#C060FF;
+  --bright:#E8F8FF;--mid:#6B9AB5;--dim:#2E4F68;
+  --border:rgba(0,200,255,0.14);--r:18px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--void);color:var(--bright);font-family:'Noto Sans SC',sans-serif;overflow-x:hidden;min-height:100vh;}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.gbg{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(0,200,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+nav.top{position:fixed;inset:0 0 auto 0;z-index:100;height:64px;padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(3,8,18,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo svg{width:32px;height:32px;}
+.logo-name{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--neon),#00FFE5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+nav.top ul{display:flex;gap:24px;list-style:none;}
+nav.top ul a{color:var(--mid);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:1.5px;font-family:'Orbitron',sans-serif;transition:color .2s;}
+nav.top ul a:hover{color:var(--neon);}
+
+.wrap{position:relative;z-index:10;padding-top:64px;}
+.page-head{padding:36px 24px 20px;text-align:center;max-width:900px;margin:0 auto;}
+.page-head h1{font-family:'Orbitron',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;margin-bottom:8px;}
+.page-head h1 em{font-style:normal;color:var(--purple);}
+.page-head p{font-size:14px;color:var(--mid);}
+
+.assemble-main{max-width:900px;margin:0 auto;padding:0 24px 100px;
+  display:grid;grid-template-columns:1fr 380px;gap:20px;}
+
+/* Canvas */
+.canvas-wrap{background:radial-gradient(ellipse at center,rgba(192,96,255,0.06),transparent 70%),var(--card);
+  border:1px solid var(--border);border-radius:var(--r);
+  min-height:480px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;position:relative;padding:24px;overflow:hidden;}
+.creature{display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:88px;line-height:1;animation:bob 3s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.creature-part{transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.creature-part.swap{animation:swapIn .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes swapIn{from{transform:scale(0.4) rotate(-20deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+.canvas-grid{position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(192,96,255,0.15) 1px,transparent 1px);
+  background-size:30px 30px;opacity:.4;}
+.canvas-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.cr{position:absolute;border:1px solid rgba(192,96,255,0.12);border-radius:50%;}
+.cr.r1{width:260px;height:260px;animation:rot 24s linear infinite;}
+.cr.r2{width:340px;height:340px;animation:rot 36s linear infinite reverse;}
+@keyframes rot{to{transform:rotate(360deg);}}
+
+.canvas-name{position:absolute;top:18px;font-family:'Orbitron',sans-serif;font-size:11px;
+  font-weight:700;letter-spacing:2px;color:var(--purple);text-transform:uppercase;}
+.canvas-hint{position:absolute;bottom:18px;font-size:12px;color:var(--dim);}
+
+/* Parts panel */
+.parts-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.part-tabs{display:flex;border-bottom:1px solid var(--border);}
+.ptab{flex:1;padding:14px;background:transparent;border:none;cursor:pointer;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  color:var(--dim);transition:all .2s;-webkit-tap-highlight-color:transparent;
+  border-bottom:2px solid transparent;}
+.ptab.active{color:var(--purple);border-bottom-color:var(--purple);background:rgba(192,96,255,.04);}
+
+.parts-grid{padding:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  max-height:340px;overflow-y:auto;}
+.parts-grid::-webkit-scrollbar{width:6px;}
+.parts-grid::-webkit-scrollbar-thumb{background:rgba(0,200,255,.15);border-radius:3px;}
+.part{padding:14px;background:rgba(0,200,255,.04);border:2px solid var(--border);
+  border-radius:12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;
+  align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;}
+.part:hover,.part.active{border-color:var(--purple);background:rgba(192,96,255,.08);}
+.part-emoji{font-size:32px;}
+.part-name{font-size:10px;color:var(--mid);text-align:center;}
+.part.active .part-name{color:var(--purple);font-weight:700;}
+
+.btn-bar{position:sticky;bottom:0;padding:18px 24px;
+  background:rgba(3,8,18,0.96);backdrop-filter:blur(16px);border-top:1px solid var(--border);
+  display:flex;gap:10px;}
+.btn{flex:1;padding:14px;border:none;border-radius:12px;font-family:'Orbitron',sans-serif;
+  font-size:13px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:all .2s;
+  -webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-reset{background:rgba(0,200,255,.06);border:1px solid var(--border);color:var(--mid);flex:0 0 auto;padding:14px 22px;}
+.btn-reset:hover{border-color:var(--neon);color:var(--neon);}
+.btn-save{background:linear-gradient(135deg,var(--purple),#8033CC);color:#fff;
+  box-shadow:0 6px 24px rgba(192,96,255,.35);}
+.btn-save:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(192,96,255,.5);}
+
+/* Save success toast */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:rgba(59,255,90,.15);border:1px solid var(--green);
+  color:var(--green);padding:14px 24px;border-radius:12px;
+  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;
+  backdrop-filter:blur(16px);z-index:200;transition:transform .3s ease;
+  display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── BOTTOM NAV ── */
+nav.bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;height:68px;
+  background:rgba(3,8,18,0.97);backdrop-filter:blur(24px);border-top:1px solid rgba(0,200,255,0.12);
+  padding:0 8px;justify-content:space-around;align-items:center;}
+.bn{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;
+  color:var(--dim);padding:6px 12px;transition:color .2s;-webkit-tap-highlight-color:transparent;flex:1;}
+.bn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bn span{font-size:10px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;}
+.bn-fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#FF3300);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(255,107,26,0.45);
+  margin-top:-18px;border:3px solid rgba(3,8,18,0.9);text-decoration:none;flex-shrink:0;
+  transition:transform .15s;-webkit-tap-highlight-color:transparent;}
+.bn-fab:active{transform:scale(0.92);}
+.bn-fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+@media(max-width:1280px){
+  nav.top ul{display:none;}nav.top{padding:0 16px;}
+  nav.bnav{display:flex;}
+  .page-head{padding:24px 16px 16px;}
+  .assemble-main{grid-template-columns:1fr;padding:0 16px 100px;}
+  .canvas-wrap{min-height:340px;padding:20px;}
+  .creature{font-size:64px;}
+  .parts-grid{grid-template-columns:repeat(4,1fr);max-height:260px;}
+  .part-emoji{font-size:26px;}
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="gbg"></div>
+
+<div class="toast" id="toast">✅ 已保存到我的资源库</div>
+
+<nav class="top">
+  <a href="index.html" class="logo">
+    <svg viewBox="0 0 34 34" fill="none">
+      <polygon points="17,2 32,10 32,24 17,32 2,24 2,10" stroke="url(#lgA)" stroke-width="1.5" fill="rgba(0,200,255,0.06)"/>
+      <defs><linearGradient id="lgA" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C8FF"/><stop offset="100%" stop-color="#00FFE5"/></linearGradient></defs>
+    </svg>
+    <span class="logo-name">FORGE3D</span>
+  </a>
+  <ul>
+    <li><a href="index.html">首页</a></li>
+    <li><a href="library.html">探索</a></li>
+    <li><a href="learn.html">学习</a></li>
+    <li><a href="ai-create.html">AI创作</a></li>
+    <li><a href="profile.html">我的</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>🔧 <em>组装工坊</em></h1>
+    <p>组合不同的零件，创造独一无二的生物！</p>
+  </div>
+
+  <div class="assemble-main">
+
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+      <div class="canvas-grid"></div>
+      <div class="canvas-rings">
+        <div class="cr r1"></div>
+        <div class="cr r2"></div>
+      </div>
+      <div class="canvas-name" id="canvasName">奇幻生物 #1</div>
+      <div class="creature" id="creature">
+        <span class="creature-part" id="pHead">🦁</span>
+        <span class="creature-part" id="pBody">🦒</span>
+        <span class="creature-part" id="pLegs">🦵</span>
+      </div>
+      <div class="canvas-hint">点击右边零件，组装你的奇幻生物</div>
+    </div>
+
+    <!-- Parts panel -->
+    <div class="parts-panel">
+      <div class="part-tabs">
+        <button class="ptab active" data-t="head" onclick="setTab(this,'head')">👤 头部</button>
+        <button class="ptab" data-t="body" onclick="setTab(this,'body')">🦴 身体</button>
+        <button class="ptab" data-t="legs" onclick="setTab(this,'legs')">🦵 腿脚</button>
+      </div>
+      <div class="parts-grid" id="partsGrid"></div>
+      <div class="btn-bar">
+        <button class="btn btn-reset" onclick="resetParts()">↻ 重置</button>
+        <button class="btn btn-save" onclick="saveCreature()">💾 保存我的生物</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<nav class="bnav">
+  <a href="index.html" class="bn">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>首页</span>
+  </a>
+  <a href="library.html" class="bn">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探索</span>
+  </a>
+  <a href="ai-create.html" class="bn-fab">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  </a>
+  <a href="learn.html" class="bn">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    <span>学习</span>
+  </a>
+  <a href="profile.html" class="bn">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>我的</span>
+  </a>
+</nav>
+
+<script>
+(function(){
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const stars=Array.from({length:140},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.3+.3,a:Math.random(),s:Math.random()*.003+.001}));
+  (function draw(){ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{s.a+=s.s;if(s.a>1){s.a=0;s.x=Math.random();s.y=Math.random();}
+      ctx.globalAlpha=s.a*.6;ctx.fillStyle='#E8F8FF';
+      ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);ctx.fill();});
+    ctx.globalAlpha=1;requestAnimationFrame(draw);})();
+})();
+
+const PARTS={
+  head:[
+    {e:'🦁',n:'狮子头'},{e:'🐯',n:'老虎头'},{e:'🐰',n:'兔子头'},
+    {e:'🐻',n:'熊头'},{e:'🦊',n:'狐狸头'},{e:'🐼',n:'熊猫头'},
+    {e:'🐸',n:'青蛙头'},{e:'🦉',n:'猫头鹰'},{e:'🐲',n:'龙头'},
+    {e:'🦄',n:'独角兽'},{e:'🐙',n:'章鱼头'},{e:'🤖',n:'机器人'},
+  ],
+  body:[
+    {e:'🦒',n:'长颈鹿'},{e:'🐘',n:'大象身'},{e:'🦏',n:'犀牛身'},
+    {e:'🐪',n:'骆驼身'},{e:'🦓',n:'斑马身'},{e:'🐬',n:'海豚身'},
+    {e:'🐢',n:'乌龟壳'},{e:'🦔',n:'刺猬身'},{e:'🦕',n:'恐龙身'},
+  ],
+  legs:[
+    {e:'🦵',n:'人腿'},{e:'🐾',n:'兽爪'},{e:'🪶',n:'鸟脚'},
+    {e:'🦶',n:'大脚'},{e:'🦿',n:'机械腿'},{e:'🐙',n:'触手'},
+  ],
+};
+const NAMES=['奇幻生物','梦幻怪物','魔法守护者','星际异形','森林精灵','未来战士'];
+
+let cur={head:'🦁',body:'🦒',legs:'🦵'};
+let tab='head';
+let nameIdx=0;
+
+function setTab(el,t){
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  tab=t;renderParts();
+}
+function renderParts(){
+  const list=PARTS[tab];
+  document.getElementById('partsGrid').innerHTML=list.map(p=>`
+    <div class="part${cur[tab]===p.e?' active':''}" onclick="pickPart('${p.e}','${p.n}')">
+      <div class="part-emoji">${p.e}</div>
+      <div class="part-name">${p.n}</div>
+    </div>`).join('');
+}
+function pickPart(emoji,name){
+  cur[tab]=emoji;
+  const id={head:'pHead',body:'pBody',legs:'pLegs'}[tab];
+  const el=document.getElementById(id);
+  el.classList.remove('swap');void el.offsetWidth;
+  el.classList.add('swap');
+  el.textContent=emoji;
+  renderParts();
+  /* random name on first change */
+  document.getElementById('canvasName').textContent=NAMES[nameIdx%NAMES.length]+' #'+(nameIdx+1);
+  nameIdx++;
+}
+function resetParts(){
+  cur={head:'🦁',body:'🦒',legs:'🦵'};
+  document.getElementById('pHead').textContent=cur.head;
+  document.getElementById('pBody').textContent=cur.body;
+  document.getElementById('pLegs').textContent=cur.legs;
+  renderParts();
+}
+function saveCreature(){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+renderParts();
+</script>
+</body>
+</html>

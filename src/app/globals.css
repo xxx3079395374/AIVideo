@@ -1,0 +1,341 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --font-sans:
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', ui-sans-serif,
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  --font-serif:
+    'Noto Serif SC', 'Songti SC', 'SimSun', ui-serif, Georgia, Cambria,
+    'Times New Roman', Times, serif;
+}
+
+:root {
+  --radius: 0.75rem;
+  /* FORGE3D 暗黑赛博朋克主题 */
+  --background: #0a1628;
+  --foreground: #E8F8FF;
+  --card: rgb(22,48,84);
+  --card-foreground: #E8F8FF;
+  --popover: rgb(22,48,84);
+  --popover-foreground: #E8F8FF;
+  --primary: #00C8FF;
+  --primary-foreground: #0a1628;
+  --secondary: rgb(14,32,60);
+  --secondary-foreground: #B8D8F0;
+  --muted: rgb(14,32,60);
+  --muted-foreground: #6B9AB5;
+  --accent: #00C8FF;
+  --accent-foreground: #0a1628;
+  --destructive: #FF3D00;
+  --border: rgba(0,200,255,0.14);
+  --input: rgba(0,200,255,0.12);
+  --ring: #00C8FF;
+  /* 彩色图表 */
+  --chart-1: #00C8FF;
+  --chart-2: #A855F7;
+  --chart-3: #3BFF5A;
+  --chart-4: #FFB800;
+  --chart-5: #FF6B1A;
+  /* 侧边栏 */
+  --sidebar: rgb(16,36,66);
+  --sidebar-foreground: #E8F8FF;
+  --sidebar-primary: #00C8FF;
+  --sidebar-primary-foreground: #0a1628;
+  --sidebar-accent: rgba(0,200,255,0.08);
+  --sidebar-accent-foreground: #00C8FF;
+  --sidebar-border: rgba(0,200,255,0.14);
+  --sidebar-ring: #00C8FF;
+}
+
+.dark {
+  --radius: 0.75rem;
+  /* FORGE3D 暗黑赛博朋克主题 */
+  --background: #0a1628;
+  --foreground: #E8F8FF;
+  --card: rgb(22,48,84);
+  --card-foreground: #E8F8FF;
+  --popover: rgb(22,48,84);
+  --popover-foreground: #E8F8FF;
+  --primary: #00C8FF;
+  --primary-foreground: #0a1628;
+  --secondary: rgb(14,32,60);
+  --secondary-foreground: #B8D8F0;
+  --muted: rgb(14,32,60);
+  --muted-foreground: #6B9AB5;
+  --accent: #00C8FF;
+  --accent-foreground: #0a1628;
+  --destructive: #FF3D00;
+  --border: rgba(0,200,255,0.14);
+  --input: rgba(0,200,255,0.12);
+  --ring: #00C8FF;
+  /* 彩色图表 */
+  --chart-1: #00C8FF;
+  --chart-2: #A855F7;
+  --chart-3: #3BFF5A;
+  --chart-4: #FFB800;
+  --chart-5: #FF6B1A;
+  /* 侧边栏 */
+  --sidebar: rgb(16,36,66);
+  --sidebar-foreground: #E8F8FF;
+  --sidebar-primary: #00C8FF;
+  --sidebar-primary-foreground: #0a1628;
+  --sidebar-accent: rgba(0,200,255,0.08);
+  --sidebar-accent-foreground: #00C8FF;
+  --sidebar-border: rgba(0,200,255,0.14);
+  --sidebar-ring: #00C8FF;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+body {
+  @apply font-sans;
+}
+
+/* Custom scrollbar — dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0,200,255,0.04);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,200,255,0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,200,255,0.25);
+}
+
+/* ── Atmospheric background animations ── */
+@keyframes driftA {
+  0%, 100% { transform: translate(0, 0); }
+  33%      { transform: translate(60px, 40px); }
+  66%      { transform: translate(-20px, -30px); }
+}
+
+@keyframes driftB {
+  0%, 100% { transform: translate(0, 0); }
+  33%      { transform: translate(-40px, -25px); }
+  66%      { transform: translate(30px, 20px); }
+}
+
+@keyframes scan {
+  from { top: -4px; }
+  to   { top: 100vh; }
+}
+
+/* Refined horizontal scrollbar for material library rows */
+.scrollbar-refined::-webkit-scrollbar {
+  height: 4px;
+}
+
+.scrollbar-refined::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-refined::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+}
+
+.scrollbar-refined:hover::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+}
+
+.scrollbar-refined:hover::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* Glow effects - 彩色阴影 */
+.glow-blue {
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+}
+
+.glow-purple {
+  box-shadow: 0 4px 14px rgba(167, 139, 250, 0.25);
+}
+
+.glow-green {
+  box-shadow: 0 4px 14px rgba(52, 211, 153, 0.25);
+}
+
+.glow-pink {
+  box-shadow: 0 4px 14px rgba(244, 114, 182, 0.25);
+}
+
+.glow-orange {
+  box-shadow: 0 4px 14px rgba(251, 191, 36, 0.25);
+}
+
+/* Gradient backgrounds - 明亮渐变 */
+.gradient-bg {
+  background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 50%, #FDF4FF 100%);
+}
+
+.gradient-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+}
+
+/* Drag and drop styles */
+.dragging {
+  opacity: 0.7;
+  transform: scale(1.02);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.drop-zone-active {
+  border-color: #3B82F6 !important;
+  background: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* 彩色标签样式 */
+.tag-blue {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.tag-purple {
+  background: #FAF5FF;
+  color: #7C3AED;
+}
+
+.tag-green {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+.tag-pink {
+  background: #FDF2F8;
+  color: #DB2777;
+}
+
+.tag-orange {
+  background: #FFFBEB;
+  color: #D97706;
+}
+
+.tag-cyan {
+  background: #ECFEFF;
+  color: #0891B2;
+}
+
+/* 卡片悬浮效果 */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 彩色边框卡片 */
+.card-border-blue {
+  border-left: 4px solid #3B82F6;
+}
+
+.card-border-purple {
+  border-left: 4px solid #A78BFA;
+}
+
+.card-border-green {
+  border-left: 4px solid #34D399;
+}
+
+.card-border-pink {
+  border-left: 4px solid #F472B6;
+}
+
+.card-border-orange {
+  border-left: 4px solid #FBBF24;
+}
+
+/* 动画效果 */
+@keyframes bounce-soft {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 2s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+
+#coze-coding-badge {
+    display: none !important;
+}
+  

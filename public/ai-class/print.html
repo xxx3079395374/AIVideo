@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开始打印 · FORGE3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#030812;--card:rgba(8,20,42,0.88);
+  --neon:#00C8FF;--orange:#FF6B1A;--green:#3BFF5A;--gold:#FFB800;
+  --bright:#E8F8FF;--mid:#6B9AB5;--dim:#2E4F68;
+  --border:rgba(0,200,255,0.14);--r:18px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--void);color:var(--bright);font-family:'Noto Sans SC',sans-serif;overflow-x:hidden;min-height:100vh;}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.gbg{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(0,200,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.018) 1px,transparent 1px);
+  background-size:64px 64px;}
+
+nav.top{position:fixed;inset:0 0 auto 0;z-index:100;height:64px;padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(3,8,18,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo svg{width:32px;height:32px;}
+.logo-name{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:900;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--neon),#00FFE5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+nav.top ul{display:flex;gap:24px;list-style:none;}
+nav.top ul a{color:var(--mid);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:1.5px;font-family:'Orbitron',sans-serif;transition:color .2s;}
+nav.top ul a:hover{color:var(--neon);}
+
+.wrap{position:relative;z-index:10;padding-top:64px;}
+.back-bar{padding:20px 40px;max-width:900px;margin:0 auto;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--mid);text-decoration:none;
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;
+  padding:8px 14px;border-radius:8px;background:rgba(0,200,255,0.06);
+  border:1px solid var(--border);transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.back-btn:hover{border-color:var(--neon);color:var(--neon);}
+.back-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;}
+
+.print-main{max-width:900px;margin:0 auto;padding:0 24px 100px;display:flex;flex-direction:column;gap:18px;}
+.page-title{text-align:center;padding:8px 0 28px;}
+.page-title h1{font-family:'Orbitron',sans-serif;font-size:clamp(26px,4vw,36px);font-weight:900;margin-bottom:8px;}
+.page-title h1 em{font-style:normal;color:var(--orange);}
+.page-title p{font-size:15px;color:var(--mid);}
+
+/* Model preview card */
+.model-row{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;display:flex;align-items:center;gap:24px;}
+.mr-thumb{width:96px;height:96px;border-radius:14px;background:rgba(0,200,255,.06);
+  display:flex;align-items:center;justify-content:center;font-size:56px;flex-shrink:0;}
+.mr-info{flex:1;}
+.mr-name{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;color:var(--bright);margin-bottom:8px;}
+.mr-meta{display:flex;gap:14px;flex-wrap:wrap;}
+.mr-tag{font-size:13px;color:var(--mid);display:flex;align-items:center;gap:5px;}
+.mr-tag strong{color:var(--bright);}
+
+/* Settings — kid-friendly 3 options */
+.setting-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px 28px;}
+.setting-label{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:2px;color:var(--neon);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.setting-label::before{content:'';width:3px;height:12px;background:var(--neon);border-radius:2px;}
+.setting-desc{font-size:13px;color:var(--dim);margin-bottom:18px;line-height:1.7;}
+.option-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.opt{padding:18px 16px;background:rgba(0,200,255,.04);border:2px solid var(--border);
+  border-radius:14px;cursor:pointer;transition:all .22s;text-align:center;
+  -webkit-tap-highlight-color:transparent;}
+.opt:hover,.opt.active{border-color:var(--neon);background:rgba(0,200,255,.1);}
+.opt.active{box-shadow:0 0 18px rgba(0,200,255,.2);}
+.opt-emoji{font-size:32px;line-height:1;margin-bottom:8px;}
+.opt-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:var(--bright);margin-bottom:4px;}
+.opt-sub{font-size:11px;color:var(--mid);}
+.opt.active .opt-title{color:var(--neon);}
+
+/* Material color picker */
+.color-row{display:flex;gap:14px;flex-wrap:wrap;}
+.color-chip{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;}
+.color-dot{width:48px;height:48px;border-radius:50%;border:3px solid transparent;
+  transition:all .22s;position:relative;}
+.color-chip.active .color-dot{border-color:var(--neon);transform:scale(1.08);
+  box-shadow:0 0 14px rgba(0,200,255,.4);}
+.color-chip.active .color-dot::after{content:'✓';position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;color:#fff;font-weight:900;
+  text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.color-name{font-size:11px;color:var(--mid);font-family:'Orbitron',sans-serif;letter-spacing:.5px;}
+.color-chip.active .color-name{color:var(--neon);}
+
+/* Summary */
+.summary{background:linear-gradient(135deg,rgba(255,107,26,0.08),rgba(0,200,255,0.04));
+  border:1px solid rgba(255,107,26,.18);border-radius:var(--r);
+  padding:24px 28px;}
+.sum-label{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:18px;}
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.sum-cell{padding:0 14px;border-right:1px solid rgba(255,255,255,.05);
+  display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;}
+.sum-cell:last-child{border-right:none;}
+.sum-emoji{font-size:24px;line-height:1;margin-bottom:4px;}
+.sum-val{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--bright);}
+.sum-key{font-size:11px;color:var(--mid);}
+
+/* Big Start Print button */
+.start-print{width:100%;padding:22px;border:none;border-radius:var(--r);
+  background:linear-gradient(135deg,var(--orange),#FF3300);color:#fff;
+  font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;letter-spacing:2px;
+  cursor:pointer;transition:all .25s;box-shadow:0 10px 40px rgba(255,107,26,.45);
+  display:flex;align-items:center;justify-content:center;gap:10px;}
+.start-print:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(255,107,26,.6);}
+.start-print:active{transform:scale(.98);}
+
+/* Printing overlay */
+.print-overlay{display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(3,8,18,.96);backdrop-filter:blur(18px);
+  align-items:center;justify-content:center;flex-direction:column;padding:24px;}
+.print-overlay.show{display:flex;}
+.printer{width:200px;height:200px;position:relative;margin-bottom:32px;}
+.printer-base{position:absolute;left:0;right:0;bottom:0;height:24px;
+  background:linear-gradient(180deg,#1a2540,#0a1428);border-radius:8px;
+  border:1px solid var(--border);}
+.printer-frame{position:absolute;left:30px;right:30px;bottom:24px;top:30px;
+  border:2px solid var(--border);border-radius:6px;background:rgba(0,200,255,.03);}
+.printer-bed{position:absolute;left:40px;right:40px;bottom:36px;height:6px;
+  background:linear-gradient(90deg,#0066AA,#00C8FF);border-radius:3px;}
+.printer-head{position:absolute;left:50%;width:18px;height:18px;margin-left:-9px;top:50px;
+  background:var(--orange);border-radius:3px;box-shadow:0 0 12px rgba(255,107,26,.6);
+  animation:headMove 2.4s ease-in-out infinite;}
+@keyframes headMove{0%,100%{transform:translateX(-40px);}50%{transform:translateX(40px);}}
+.printer-build{position:absolute;left:50%;width:32px;margin-left:-16px;bottom:42px;
+  background:rgba(255,107,26,.4);border-radius:3px 3px 0 0;
+  animation:buildUp 5s ease-out infinite;}
+@keyframes buildUp{0%{height:0;}100%{height:60px;}}
+.po-title{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;
+  color:var(--bright);margin-bottom:8px;text-align:center;}
+.po-sub{font-size:14px;color:var(--mid);margin-bottom:24px;text-align:center;}
+.po-progress{width:100%;max-width:300px;height:8px;background:rgba(0,200,255,.1);
+  border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.po-fill{height:100%;background:linear-gradient(90deg,var(--orange),#FF3300);
+  border-radius:4px;width:0%;transition:width .3s;}
+.po-pct{font-family:'Orbitron',sans-serif;font-size:32px;font-weight:900;
+  color:var(--orange);margin-bottom:32px;}
+.po-actions{display:flex;gap:12px;}
+.po-btn{padding:12px 28px;border-radius:12px;background:transparent;border:1.5px solid var(--border);
+  color:var(--mid);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;}
+.po-btn:hover{border-color:var(--neon);color:var(--neon);}
+.po-btn.primary{background:linear-gradient(135deg,var(--neon),#0088CC);border-color:transparent;color:#000;}
+
+/* ── BOTTOM NAV ── */
+nav.bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;height:68px;
+  background:rgba(3,8,18,0.97);backdrop-filter:blur(24px);border-top:1px solid rgba(0,200,255,0.12);
+  padding:0 8px;justify-content:space-around;align-items:center;}
+.bn{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;
+  color:var(--dim);padding:6px 12px;transition:color .2s;-webkit-tap-highlight-color:transparent;flex:1;}
+.bn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bn span{font-size:10px;font-weight:700;font-family:'Orbitron',sans-serif;letter-spacing:.5px;}
+.bn-fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#FF3300);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(255,107,26,0.45);
+  margin-top:-18px;border:3px solid rgba(3,8,18,0.9);text-decoration:none;flex-shrink:0;
+  transition:transform .15s;-webkit-tap-highlight-color:transparent;}
+.bn-fab:active{transform:scale(0.92);}
+.bn-fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+@media(max-width:1280px){
+  nav.top ul{display:none;}nav.top{padding:0 16px;}
+  nav.bnav{display:flex;}
+  .back-bar{padding:14px 14px;}
+  .print-main{padding:0 14px 100px;}
+  .model-row{flex-direction:row;padding:18px;gap:14px;}
+  .mr-thumb{width:72px;height:72px;font-size:42px;}
+  .mr-name{font-size:17px;}
+  .setting-card,.summary{padding:20px 18px;}
+  .option-row{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .opt{padding:14px 6px;}
+  .opt-emoji{font-size:28px;}
+  .opt-title{font-size:12px;}
+  .opt-sub{font-size:10px;}
+  .color-dot{width:42px;height:42px;}
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="gbg"></div>
+
+<!-- Printing overlay -->
+<div class="print-overlay" id="printOverlay">
+  <div class="printer">
+    <div class="printer-base"></div>
+    <div class="printer-frame"></div>
+    <div class="printer-build"></div>
+    <div class="printer-bed"></div>
+    <div class="printer-head"></div>
+  </div>
+  <div class="po-title">正在打印中…</div>
+  <div class="po-sub">请耐心等待，AI 正在帮你制作这个模型</div>
+  <div class="po-progress"><div class="po-fill" id="poFill"></div></div>
+  <div class="po-pct" id="poPct">0%</div>
+  <div class="po-actions">
+    <button class="po-btn" onclick="cancelPrint()">取消打印</button>
+    <a href="profile.html" class="po-btn primary" style="text-decoration:none;display:inline-flex;align-items:center;">查看进度 →</a>
+  </div>
+</div>
+
+<nav class="top">
+  <a href="index.html" class="logo">
+    <svg viewBox="0 0 34 34" fill="none">
+      <polygon points="17,2 32,10 32,24 17,32 2,24 2,10" stroke="url(#lgP)" stroke-width="1.5" fill="rgba(0,200,255,0.06)"/>
+      <defs><linearGradient id="lgP" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C8FF"/><stop offset="100%" stop-color="#00FFE5"/></linearGradient></defs>
+    </svg>
+    <span class="logo-name">FORGE3D</span>
+  </a>
+  <ul>
+    <li><a href="index.html">首页</a></li>
+    <li><a href="library.html">探索</a></li>
+    <li><a href="learn.html">学习</a></li>
+    <li><a href="ai-create.html">AI创作</a></li>
+    <li><a href="profile.html">我的</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+  <div class="back-bar">
+    <a href="javascript:history.back()" class="back-btn">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>返回
+    </a>
+  </div>
+
+  <div class="print-main">
+    <div class="page-title">
+      <h1>🖨️ <em>开始打印</em></h1>
+      <p>选择质量和颜色，几秒后就可以打印啦！</p>
+    </div>
+
+    <!-- Model preview -->
+    <div class="model-row">
+      <div class="mr-thumb">🦖</div>
+      <div class="mr-info">
+        <div class="mr-name">霸王龙模型</div>
+        <div class="mr-meta">
+          <div class="mr-tag">🎯 <strong>简单</strong></div>
+          <div class="mr-tag">📐 <strong>10×6×8 cm</strong></div>
+          <div class="mr-tag">🧪 <strong>PLA</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quality setting -->
+    <div class="setting-card">
+      <div class="setting-label">第一步：选择打印质量</div>
+      <div class="setting-desc">质量越高，模型越精细，但打印时间也越长</div>
+      <div class="option-row" id="qualityOpts"></div>
+    </div>
+
+    <!-- Size setting -->
+    <div class="setting-card">
+      <div class="setting-label">第二步：选择尺寸</div>
+      <div class="setting-desc">想要多大的模型？随时可以更改</div>
+      <div class="option-row" id="sizeOpts"></div>
+    </div>
+
+    <!-- Color setting -->
+    <div class="setting-card">
+      <div class="setting-label">第三步：选择颜色</div>
+      <div class="setting-desc">挑一个你喜欢的颜色</div>
+      <div class="color-row" id="colorOpts"></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary">
+      <div class="sum-label">📋 打印计划</div>
+      <div class="sum-grid">
+        <div class="sum-cell">
+          <div class="sum-emoji">⏱️</div>
+          <div class="sum-val" id="sumTime">2小时</div>
+          <div class="sum-key">预计时间</div>
+        </div>
+        <div class="sum-cell">
+          <div class="sum-emoji">⚖️</div>
+          <div class="sum-val" id="sumWeight">18g</div>
+          <div class="sum-key">耗材重量</div>
+        </div>
+        <div class="sum-cell">
+          <div class="sum-emoji">⚡</div>
+          <div class="sum-val">+80</div>
+          <div class="sum-key">可获经验</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start button -->
+    <button class="start-print" onclick="startPrint()">
+      <span>🚀</span> 一键开始打印
+    </button>
+  </div>
+</div>
+
+<nav class="bnav">
+  <a href="index.html" class="bn">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>首页</span>
+  </a>
+  <a href="library.html" class="bn">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span>探索</span>
+  </a>
+  <a href="ai-create.html" class="bn-fab">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  </a>
+  <a href="learn.html" class="bn">
+    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    <span>学习</span>
+  </a>
+  <a href="profile.html" class="bn">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>我的</span>
+  </a>
+</nav>
+
+<script>
+(function(){
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  const stars=Array.from({length:140},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.3+.3,a:Math.random(),s:Math.random()*.003+.001}));
+  (function draw(){ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{s.a+=s.s;if(s.a>1){s.a=0;s.x=Math.random();s.y=Math.random();}
+      ctx.globalAlpha=s.a*.6;ctx.fillStyle='#E8F8FF';
+      ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);ctx.fill();});
+    ctx.globalAlpha=1;requestAnimationFrame(draw);})();
+})();
+
+const QUALITY=[
+  {key:'fast',emoji:'⚡',title:'快速',sub:'30分钟',tMult:0.4,wMult:0.7},
+  {key:'std',emoji:'⭐',title:'标准',sub:'2小时',tMult:1,wMult:1,def:true},
+  {key:'fine',emoji:'💎',title:'精细',sub:'4小时',tMult:2,wMult:1.3},
+];
+const SIZE=[
+  {key:'s',emoji:'🐣',title:'小巧',sub:'6 cm',tMult:0.5,wMult:0.4},
+  {key:'m',emoji:'🦕',title:'标准',sub:'10 cm',tMult:1,wMult:1,def:true},
+  {key:'l',emoji:'🦖',title:'大号',sub:'15 cm',tMult:1.8,wMult:2.4},
+];
+const COLORS=[
+  {key:'white',name:'雪白',color:'#F0F0F0'},
+  {key:'black',name:'夜黑',color:'#1a1a1a'},
+  {key:'red',name:'热血红',color:'#FF4444'},
+  {key:'blue',name:'海洋蓝',color:'#0080FF',def:true},
+  {key:'green',name:'森林绿',color:'#22C55E'},
+  {key:'yellow',name:'阳光黄',color:'#FFC818'},
+  {key:'purple',name:'神秘紫',color:'#A040FF'},
+];
+
+let curQ='std',curS='m',curC='blue';
+
+function buildOpts(el,arr,cur,onclick){
+  el.innerHTML=arr.map(o=>`
+    <div class="opt${o.key===cur?' active':''}" data-key="${o.key}" onclick="${onclick}('${o.key}')">
+      <div class="opt-emoji">${o.emoji}</div>
+      <div class="opt-title">${o.title}</div>
+      <div class="opt-sub">${o.sub}</div>
+    </div>`).join('');
+}
+function buildColors(){
+  document.getElementById('colorOpts').innerHTML=COLORS.map(c=>`
+    <div class="color-chip${c.key===curC?' active':''}" onclick="setColor('${c.key}')">
+      <div class="color-dot" style="background:${c.color}"></div>
+      <div class="color-name">${c.name}</div>
+    </div>`).join('');
+}
+function setQ(k){curQ=k;buildOpts(document.getElementById('qualityOpts'),QUALITY,curQ,'setQ');updateSummary();}
+function setS(k){curS=k;buildOpts(document.getElementById('sizeOpts'),SIZE,curS,'setS');updateSummary();}
+function setColor(k){curC=k;buildColors();}
+
+function updateSummary(){
+  const q=QUALITY.find(x=>x.key===curQ),s=SIZE.find(x=>x.key===curS);
+  const mins=Math.round(120*q.tMult*s.tMult);
+  const grams=Math.round(18*q.wMult*s.wMult);
+  document.getElementById('sumTime').textContent=mins<60?`${mins}分钟`:`${(mins/60).toFixed(1)}小时`;
+  document.getElementById('sumWeight').textContent=`${grams}g`;
+}
+
+buildOpts(document.getElementById('qualityOpts'),QUALITY,curQ,'setQ');
+buildOpts(document.getElementById('sizeOpts'),SIZE,curS,'setS');
+buildColors();
+updateSummary();
+
+let printTimer=null;
+function startPrint(){
+  document.getElementById('printOverlay').classList.add('show');
+  let pct=0;
+  const fill=document.getElementById('poFill'),txt=document.getElementById('poPct');
+  printTimer=setInterval(()=>{
+    pct=Math.min(100,pct+(Math.random()*1.5+0.3));
+    fill.style.width=pct+'%';txt.textContent=Math.floor(pct)+'%';
+    if(pct>=100){clearInterval(printTimer);txt.textContent='✅ 完成！';}
+  },140);
+}
+function cancelPrint(){
+  if(printTimer)clearInterval(printTimer);
+  document.getElementById('printOverlay').classList.remove('show');
+  document.getElementById('poFill').style.width='0%';
+  document.getElementById('poPct').textContent='0%';
+}
+
+const params=new URLSearchParams(location.search);
+const name=params.get('name'),emoji=params.get('emoji');
+if(name) document.querySelector('.mr-name').textContent=name;
+if(emoji) document.querySelector('.mr-thumb').textContent=emoji;
+</script>
+</body>
+</html>
